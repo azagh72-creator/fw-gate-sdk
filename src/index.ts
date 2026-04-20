@@ -333,6 +333,27 @@ export async function quality(callerId: string): Promise<{
   return res.json();
 }
 
+/**
+ * FW_PRICING_v1.0 — Neutral pricing schema.
+ * price = service unit  /  token = settlement method
+ * "The strong system defines WHAT you receive — not HOW you pay."
+ * FREE — public.
+ */
+export async function pricing(): Promise<{
+  operation:    string;
+  service_unit: string;
+  pricing: { amount: number; unit: string; note: string };
+  payment: { accepted_assets: string[]; settlement_layer: string; current_asset: string; note: string };
+  endpoints:    unknown[];
+  free_tier:    string[];
+  legal:        string;
+  standard:     string;
+}> {
+  const res = await fetch(`${FW_GATE_URL}/gate/pricing`);
+  if (!res.ok) throw new Error(`FW Gate pricing: HTTP ${res.status}`);
+  return res.json();
+}
+
 /** Get the FW_ENFORCE_v1.0 standard spec */
 export async function enforceSpec(): Promise<{
   standard:    string;
