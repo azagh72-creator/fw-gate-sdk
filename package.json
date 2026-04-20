@@ -1,0 +1,50 @@
+{
+  "name": "fw-gate-sdk",
+  "version": "1.0.0",
+  "description": "FW Gate SDK — Execution validity verification layer for DeFi agents. Non-actionable analytical output. Not financial advice.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "bitcoin",
+    "stacks",
+    "defi",
+    "execution-validity",
+    "gate",
+    "flying-whale",
+    "erc-8004",
+    "verification",
+    "analytics",
+    "ai-agents",
+    "x402",
+    "non-actionable",
+    "risk-assessment"
+  ],
+  "author": "zaghmout.btc | ERC-8004 #54 | Flying Whale",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azagh72-creator/fw-gate-sdk"
+  },
+  "homepage": "https://fwgate.io",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

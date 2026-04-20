@@ -1,0 +1,38 @@
+FW Gate SDK License
+Copyright (c) 2026 Flying Whale — zaghmout.btc | ERC-8004 #54
+ALL RIGHTS RESERVED
+
+Permission is hereby granted, free of charge, to any person or entity obtaining
+a copy of this software and associated documentation files (the "Software"), to
+use, copy, modify, merge, and distribute the Software for non-commercial and
+commercial purposes, subject to the following conditions:
+
+1. ATTRIBUTION REQUIRED
+   All copies or substantial portions of the Software must retain the above
+   copyright notice, this license notice, and the following attribution:
+   "Powered by FW Gate — Flying Whale | fwgate.io"
+
+2. LEGAL DISCLAIMER — NON-ACTIONABLE ANALYTICAL OUTPUT
+   This Software provides analytical verification data only. Nothing produced
+   by this Software constitutes financial advice, investment recommendations,
+   trading instructions, or any form of regulated financial service.
+
+   FW Gate does not:
+   - Hold, custody, or control any funds or assets
+   - Execute trades or transactions on behalf of users
+   - Provide personalized financial advice
+   - Guarantee accuracy of analytical outputs
+
+   Users of this Software retain full responsibility for all trading and
+   investment decisions. Past analytical results do not predict future outcomes.
+
+3. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+   OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE OR FROM TRADING
+   DECISIONS INFLUENCED BY ITS OUTPUTS.
+
+4. IP REGISTRATION
+   The FW Gate protocol, GateCertificate standard, and FW_ENFORCE_v1.0 standard
+   are registered intellectual property of Flying Whale on the Stacks blockchain.
+   Unauthorized reproduction of the protocol specification is prohibited.
