@@ -47,23 +47,7 @@ npm install fw-gate-sdk
 ## Quick Start
 
 ```typescript
-import { preview, evaluate, guard, badge, auditRecord } from 'fw-gate-sdk';
-
-// Free preview (no payment) — for UI display
-const result = await preview({
-  pair:   'WHALE/wSTX',
-  action: 'SWAP',
-  amount: 1_000_000,
-});
-
-console.log(badge(result));
-// ✅ FW Gate: viable (88%) | risk: low
-
-// Guard before execution
-if (!guard(result)) {
-  console.log('Execution halted by FW Gate analysis');
-  return;
-}
+import { evaluate, guard, badge, auditRecord, reportOutcome } from 'fw-gate-sdk';
 
 // Paid evaluation — returns signed GateCertificate (1000 μSTX)
 const cert = await evaluate(
@@ -71,9 +55,36 @@ const cert = await evaluate(
   signedPaymentTx,
 );
 
+console.log(badge(cert));
+// ✅ FW Gate: viable (88%) | risk: low | https://fwgate.io/gate/verify/fw-gate-xxx
+
+// Developer decides — FW Gate never blocks, it informs
+if (cert.gate_verdict === 'non_executable') {
+  // your choice:
+  throw new Error(`Execution conditions not viable: ${cert.reason}`);
+  // or: return; / log it / alert the user
+}
+
+if (!guard(cert)) {
+  // your choice for degraded conditions
+  return;
+}
+
+// Execute your trade here
+// ...
+
+// 15 min later — report outcome (builds the accuracy dataset)
+await reportOutcome({ gate_id: cert.gate_id, outcome: 'success', tx_hash: txId });
+
 // Attach to trade log
 const audit = auditRecord(cert);
-// { fw_gate_id, fw_verdict, fw_feasibility, fw_risk, fw_cert_hash, ... }
+// { fw_gate_id, fw_verdict, fw_feasibility, fw_cert_hash, fw_verify_url, ... }
+```
+
+**Embed in any web page:**
+```html
+<iframe src="https://fwgate.io/widget/fw-gate-xxx" width="320" height="80"
+  frameborder="0" scrolling="no" title="FW Gate Certificate"></iframe>
 ```
 
 ---
@@ -204,6 +215,44 @@ const board = await leaderboard();
 | `/gate/leaderboard` | **Free** |
 
 Payments handled via [x402 protocol](https://x402.org) — automatic micropayments on Stacks.
+
+---
+
+## Data Moat — Accuracy Tracking
+
+FW Gate builds a dataset no competitor can replicate: prediction accuracy matched against real trade outcomes.
+
+```typescript
+import { reportOutcome, accuracy } from 'fw-gate-sdk';
+
+// 15 minutes after execution — close the loop
+await reportOutcome({
+  gate_id: cert.gate_id,
+  outcome: 'success',   // success | failed | partial | cancelled | slippage | route_broken
+  tx_hash: '0x...',
+});
+
+// See prediction accuracy stats
+const stats = await accuracy();
+// { accuracy_pct: '87%', by_verdict: { viable: { total: 1200, accurate: 1052 }, ... } }
+```
+
+Every reported outcome makes the analytical model stronger. The dataset is locked to real execution history — not synthetic.
+
+---
+
+## The ISO Principle
+
+FW Gate does not block execution. It cannot. You can execute without it.
+
+But:
+- Without FW Gate = no verified feasibility data
+- Without FW Gate = not on the leaderboard  
+- Without FW Gate = the market doesn't know if your execution was valid
+
+Like ISO standards: optional in theory, required in practice.
+
+> *"Execution is possible without FW Gate. But economically, running without a GateCertificate is running without proof."*
 
 ---
 

@@ -159,11 +159,28 @@ export async function verify(gateId: string): Promise<{
 // ─── Guard ─────────────────────────────────────────────────────────────────────
 
 /**
- * Decision gate — returns true = proceed, false = halt.
- * Drop this before any execution call.
+ * Analytical guard — returns true (proceed) or false (conditions not met).
  *
- * IMPORTANT: This is an analytical tool only. The guard function halts based
- * on verification data — it does not constitute financial advice.
+ * IMPORTANT: FW Gate is a proof layer, not a governance layer.
+ * guard() returns a boolean — YOUR CODE decides what to do with it.
+ * FW Gate never blocks execution. The developer retains full decision authority.
+ *
+ * Correct pattern (developer decides):
+ * ```
+ * const result = await evaluate(...);
+ * if (result.gate_verdict === 'non_executable') {
+ *   // developer decides what to do
+ *   throw new Error('Execution conditions not viable: ' + result.reason);
+ * }
+ * if (!guard(result)) {
+ *   // developer decides
+ *   return;
+ * }
+ * ```
+ *
+ * execution IS possible without FW Gate.
+ * But: running without a GateCertificate = no verified feasibility data.
+ * The market decides what to trust.
  */
 export function guard(
   result:  GateResult | PreviewResult,
@@ -175,12 +192,12 @@ export function guard(
 ): boolean {
   if (result.gate_verdict === 'non_executable') {
     options?.onNonExecutable?.(result);
-    return false;
+    return false;  // developer decides the action
   }
   const min = options?.minFeasibility ?? 0;
   if (result.gate_verdict === 'degraded' || result.execution_feasibility < min) {
     options?.onDegraded?.(result);
-    return false;
+    return false;  // developer decides the action
   }
   return true;
 }
@@ -240,6 +257,45 @@ export async function register(params: {
   return res.json();
 }
 
+// ─── Data Moat — Outcome Reporting ────────────────────────────────────────────
+
+/**
+ * Report actual trade outcome after execution — feeds the accuracy dataset.
+ * Call this ~15 minutes after execution to close the feedback loop.
+ *
+ * Over time, FW Gate builds a dataset of prediction accuracy that
+ * no competitor can replicate — it's locked to real execution outcomes.
+ */
+export async function reportOutcome(params: {
+  gate_id:  string;
+  outcome:  'success' | 'failed' | 'partial' | 'cancelled' | 'slippage' | 'route_broken';
+  tx_hash?: string;
+  notes?:   string;
+}): Promise<{
+  recorded: boolean;
+  gate_id: string;
+  outcome: string;
+  original_verdict?: string;
+  accuracy_match?: boolean;
+}> {
+  const res = await fetch(`${FW_GATE_URL}/gate/outcome`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(params),
+  });
+  return res.json();
+}
+
+/** Get FW Gate prediction accuracy stats — proves analytical value */
+export async function accuracy(): Promise<{
+  total_outcomes: number;
+  accuracy_pct:   string;
+  by_verdict:     Record<string, { total: number; accurate: number }>;
+}> {
+  const res = await fetch(`${FW_GATE_URL}/gate/accuracy`);
+  return res.json();
+}
+
 // ─── Leaderboard & Enforce ─────────────────────────────────────────────────────
 
 /** Get the FW Gate leaderboard — top verified agents */
@@ -249,6 +305,31 @@ export async function leaderboard(): Promise<{
   top:         Array<{ rank: number; caller_id: string; evaluations: number; certified: number; score: number }>;
 }> {
   const res = await fetch(`${FW_GATE_URL}/gate/leaderboard`);
+  return res.json();
+}
+
+// ─── Quality Scoring ──────────────────────────────────────────────────────────
+
+export type QualityTier = 'UNPROVEN' | 'EMERGING' | 'ESTABLISHED' | 'VERIFIED' | 'ELITE';
+
+/**
+ * Get FW_QUALITY_SCORING_v1.0 score for any caller.
+ * Bloomberg execution quality layer — shows tier, accuracy, confidence weight, and benefits.
+ * FREE — public analytical data.
+ */
+export async function quality(callerId: string): Promise<{
+  caller_id:         string;
+  tier:              QualityTier;
+  accuracy_pct:      string;
+  evals_submitted:   number;
+  outcomes_reported: number;
+  confidence_weight: string;
+  benefits:          string[];
+  next_tier:         string;
+  note:              string;
+}> {
+  const res = await fetch(`${FW_GATE_URL}/gate/quality/${encodeURIComponent(callerId)}`);
+  if (!res.ok) throw new Error(`FW Gate quality: HTTP ${res.status}`);
   return res.json();
 }
 
