@@ -1,26 +1,32 @@
 # fw-gate-sdk
 
-**Execution Validity Verification Layer for DeFi Agents**
+**Market Safety Layer for DeFi Agents**
 
 [![npm](https://img.shields.io/npm/v/fw-gate-sdk)](https://www.npmjs.com/package/fw-gate-sdk)
 [![License](https://img.shields.io/badge/license-FW--Gate-orange)](./LICENSE)
 [![FW Gate](https://img.shields.io/badge/FW_Gate-v1.0-f7931a)](https://fwgate.io)
+[![FW_ENFORCE](https://img.shields.io/badge/FW__ENFORCE-v1.0-red)](https://fwgate.io/gate/enforce)
 
 > ⚖️ **LEGAL NOTICE**: FW Gate is an **analytical verification layer only**. It provides non-actionable analytical data. Nothing in this SDK constitutes financial advice, investment recommendations, or trading instructions. FW Gate does not hold, control, or execute any funds or assets. You retain full responsibility for all trading decisions.
 
 ---
 
-## What is FW Gate?
+## The Standard
 
-FW Gate answers one question before any agent trade executes:
+> **"Execution without GateCertificate is unverified."**
 
-> *"Is this execution actually viable?"*
+FW Gate is not a tool. It's a standard.
 
-It evaluates on-chain pool reserves, execution path integrity, market regime, and demand signals — then returns a signed **GateCertificate** with:
+Any DeFi agent, router, or bot that executes trades should carry a signed **GateCertificate** — or its execution runs without verified feasibility data.
 
+```
+if (!fw_certificate) reject_execution()   // FW_ENFORCE_v1.0
+```
+
+A GateCertificate proves:
 - `gate_verdict`: `viable` | `degraded` | `non_executable`  
 - `execution_feasibility`: `0.00` → `1.00`  
-- `cert_hash`: publicly verifiable on-chain  
+- `cert_hash`: permanently verifiable — `GET fwgate.io/gate/verify/{id}`
 
 **FW Gate does NOT**:
 - Give financial advice
@@ -156,23 +162,33 @@ auditRecord(result)
 
 ---
 
-## FW_ENFORCE_v1.0
-
-Any agent executing DeFi trades without a GateCertificate is running without verified validity data.
+## FW_ENFORCE_v1.0 — Social Enforcement
 
 ```typescript
 import { enforceSpec, leaderboard } from 'fw-gate-sdk';
 
 const spec = await enforceSpec();
-// { standard: 'FW_ENFORCE_v1.0', requirements: [...] }
+// { standard: 'FW_ENFORCE_v1.0', rule: 'if (!fw_certificate) reject_execution()' }
 
 const board = await leaderboard();
 // { top: [{ rank, caller_id, evaluations, certified, score }] }
 ```
 
-Embed the badge in your bot's README:
-```
-GET https://fwgate.io/gate/badge/{gateId}.svg
+**Three layers of social enforcement:**
+
+| Layer | URL | Effect |
+|-------|-----|--------|
+| ✅ Verify page | `fwgate.io/gate/verify/{id}` | Proof that execution was assessed |
+| ⛔ Shaming page | `fwgate.io/gate/unverified?pair=X&caller_id=Y` | "This execution was not gate-verified" |
+| 🏆 Leaderboard | `fwgate.io/gate/leaderboard` | Verified agents ranked publicly |
+
+**Embed badge in your bot's README or UI:**
+```html
+<!-- Static badge -->
+<img src="https://fwgate.io/gate/badge/{gateId}.svg" />
+
+<!-- Live widget (shows real-time verdict) -->
+<script src="https://fwgate.io/gate/widget.js" data-gate-id="fw-gate-xxx"></script>
 ```
 
 ---
