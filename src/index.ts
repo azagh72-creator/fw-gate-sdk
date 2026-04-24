@@ -20,7 +20,9 @@
  *   console.log(badge(gate));  // "✅ FW Gate: viable (88%) | risk: low | ..."
  */
 
-export const FW_GATE_URL = 'https://fwgate.io';
+export const FW_GATE_URL = 'https://fwgate.to';
+export const SEIN_VERSION = 'v5.0.0';
+export const FW_EVV_HASH  = '07bb74cebc81a08a4eed853169371e499a5c897ea3b0f2ab76690ae2c6da4e44';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
