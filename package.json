@@ -1,6 +1,6 @@
 {
   "name": "fw-gate-sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "FW Gate SDK — Execution validity verification layer for DeFi agents. Non-actionable analytical output. Not financial advice.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -42,7 +42,7 @@
     "type": "git",
     "url": "https://github.com/azagh72-creator/fw-gate-sdk"
   },
-  "homepage": "https://fwgate.io",
+  "homepage": "https://fwgate.to",
   "devDependencies": {
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
